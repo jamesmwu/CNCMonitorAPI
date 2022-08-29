@@ -1,4 +1,26 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using Newtonsoft.Json.Serialization;
+
+var builder = WebApplication.CreateBuilder(args);
+
+//Enable CORS
+builder.Services.AddCors(c =>
+{
+    c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+    //var frontendURL = Configuration.GetValue<string>("frontend_url");
+    //c.AddDefaultPolicy(builder =>
+    //{
+    //    builder.WithOrigins(frontendURL).AllowAnyMethod().AllowAnyHeader()
+    //        .WithExposedHeaders(new string[] { "totalAmountOfRecords" });
+    //});
+
+});
+
+//JSON Serializer
+builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
+options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore)
+    .AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver
+    = new DefaultContractResolver());
+
 
 // Add services to the container.
 
