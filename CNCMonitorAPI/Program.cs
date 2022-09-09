@@ -5,7 +5,19 @@ var builder = WebApplication.CreateBuilder(args);
 //Enable CORS
 builder.Services.AddCors(c =>
 {
+    //c.AddPolicy("corsapp", builder =>
+    //{
+    //    builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+    //});
+
     c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
+    //c.AddPolicy("AllowOrigin", options => {
+    //    options.WithOrigins("https://localhost:7024", "*").AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+
+    //});
+
+
     //var frontendURL = Configuration.GetValue<string>("frontend_url");
     //c.AddDefaultPolicy(builder =>
     //{
@@ -37,6 +49,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
 app.UseHttpsRedirection();
 
