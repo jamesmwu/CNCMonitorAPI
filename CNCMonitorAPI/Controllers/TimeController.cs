@@ -19,7 +19,7 @@ namespace CNCMonitorAPI.Controllers
         }
 
         //Select entries based on date range
-        [HttpGet("Date range")]
+        [HttpGet("Date")]
         public async Task<JsonResult> Get(DateTime begin, DateTime end, int limit)
         {
             string query = @"
@@ -43,6 +43,49 @@ namespace CNCMonitorAPI.Controllers
                         myCommand.Parameters.AddWithValue("@begin", begin);
                         myCommand.Parameters.AddWithValue("@end", end);
                         myCommand.Parameters.AddWithValue("@limit", limit);
+
+
+                        myReader = myCommand.ExecuteReader();
+                        table.Load(myReader);
+
+                        myReader.Close();
+                        mycon.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            return new JsonResult(table);
+        }
+
+        //Select entries based on date range and machineID
+        [HttpGet("Date-Machine")]
+        public async Task<JsonResult> Get(DateTime begin, DateTime end, int machineId, int limit)
+        {
+            string query = @"
+                        SELECT * FROM 
+                        `cnc-machine-db`.Time
+                        WHERE Time BETWEEN @begin AND @end AND idMachine = @machineId
+                        LIMIT @limit;
+            ";
+
+            DataTable table = new DataTable();
+            try
+            {
+                string sqlDataSource = _configuration.GetConnectionString("cncMachine");
+                MySqlDataReader myReader;
+                using (MySqlConnection mycon = new MySqlConnection(sqlDataSource))
+                {
+                    await mycon.OpenAsync();
+                    using (MySqlCommand myCommand = new MySqlCommand(query, mycon))
+                    {
+
+                        myCommand.Parameters.AddWithValue("@begin", begin);
+                        myCommand.Parameters.AddWithValue("@end", end);
+                        myCommand.Parameters.AddWithValue("@limit", limit);
+                        myCommand.Parameters.AddWithValue("@machineId", machineId);
 
 
                         myReader = myCommand.ExecuteReader();
